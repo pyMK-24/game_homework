@@ -93,8 +93,15 @@ class Magic(Hero):
 
     def apply_super_power(self, boss, heroes):
         # TODO Implementation of BOOST ability
-        pass
-
+        global round_number
+        if round_number <= 4:
+            for hero in heroes:
+                if hero.health > 0 and type(hero) != Magic:
+                    boost = randint(5,15)
+                    hero.damage += boost
+                print(f"Magic {self.name} boosts {hero.name}'s damage by {boost}!")
+        else:
+            print(f"Magic {self.name} can no longer boost damage after round 4.")
 
 class Medic(Hero):
     def __init__(self, name, health, damage, heal_points):
@@ -124,7 +131,40 @@ class Berserk(Hero):
         boss.health -= self.blocked_damage
         print(f'Berserk {self.name} reverted {self.__blocked_damage} damage to boss')
 
+class Witcher(Hero):
+    def __init__(self, name, health, damage):
+        super().__init__(name, health, damage, 'resurrection')
 
+    def apply_super_power(self, boss, heroes):
+        for hero in heroes:
+            if hero.health == 0:
+                hero.health = 100
+                self.health = 0
+                print(f'Witcher {self.name} resurrected the hero {hero.name}')
+                break
+    
+    def attack(self, boss):
+        pass
+
+
+class Hacker(Hero):
+    def __init__(self, name, health, damage):
+        super().__init__(name, health, damage, 'HACKING')
+        
+    def apply_super_power(self, boss, heroes):
+        health_to_hero = randint(5,25)
+        if boss.health > health_to_hero:
+            boss.health -= health_to_hero
+            print(f'Hacker {self.name} took away my health  boss and transferred {health_to_hero}')
+        
+            hero_to_receive = choice([hero for hero in heroes if hero.health > 0])
+            hero_to_receive.health += health_to_hero 
+            print(f'Hacker {self.name} sent {health_to_hero} health to {hero_to_receive.name}.')
+        else:
+            print(f'Hacker {self.name} tried to take health, but the Boss has too little health.')
+        
+        
+   
 round_number = 0
 
 
@@ -170,8 +210,10 @@ def start_game():
     doc = Medic('Merlin', 250, 5, 15)
     assistant = Medic('Florin', 300, 5, 5)
     berserk = Berserk('Guts', 260, 10)
+    witcher = Witcher('Antonio', 300,0)
+    hacker = Hacker('Anonimus',275,12)
 
-    heroes_list = [warrior_1, warrior_2, magic, doc, assistant, berserk]
+    heroes_list = [warrior_1, warrior_2, magic, doc, assistant, berserk,witcher,hacker]
 
     show_statistics(boss, heroes_list)
     while not is_game_over(boss, heroes_list):
